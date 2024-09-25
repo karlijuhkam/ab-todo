@@ -13,12 +13,12 @@ defineOptions({
 
 <style lang="scss">
 .q-page {
-  @media (min-width: 600px) {
+  @media (min-width: $breakpoint-sm-min) {
     padding-left: 5rem;
     padding-right: 5rem;
   }
 
-  @media (min-width: 1440px) {
+  @media (min-width: $breakpoint-lg-min) {
     padding-left: 10rem;
     padding-right: 10rem;
   }
