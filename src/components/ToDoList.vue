@@ -1,6 +1,6 @@
 <template>
   <div class="column q-pa-md q-gutter-md full-width full-height">
-    <div class="flex justify-between q">
+    <div class="flex justify-between q-gutter-sm">
       <q-btn-toggle v-model="filter" toggle-color="primary" :options="[
         { label: 'Show all', value: 'all' },
         { label: 'Done', value: 'done' },
@@ -20,7 +20,7 @@
       </q-input>
     </div>
     <q-virtual-scroll v-if="filteredToDos && filteredToDos.length > 0" bordered class="rounded-borders"
-      :items="filteredToDos" v-slot="{ item, index }" style="height: 75dvh">
+      :items="filteredToDos" v-slot="{ item, index }" style="height: 80dvh">
       <q-item :key="index" clickable v-ripple>
         <q-item-section>
           <q-checkbox size="lg" v-model="item.completed" val="lg" :label="item.title" />
@@ -59,7 +59,7 @@ const loadInitialData = async () => {
     .catch(error => {
       $q.notify({
         icon: 'error',
-        message: 'Something went wrong while loading the to-do list. ' + error,
+        message: 'Something went wrong while loading the to-do list.' + error,
         color: 'red',
         position: 'top',
         actions: [

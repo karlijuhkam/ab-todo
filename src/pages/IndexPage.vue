@@ -14,8 +14,8 @@ defineOptions({
 <style lang="scss">
 .q-page {
   @media (min-width: $breakpoint-sm-min) {
-    padding-left: 5rem;
-    padding-right: 5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 
   @media (min-width: $breakpoint-lg-min) {
