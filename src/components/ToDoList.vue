@@ -1,6 +1,6 @@
 <template>
   <div class="column q-pa-md q-gutter-md full-width full-height">
-    <div class="flex justify-between q-gutter-sm">
+    <div class="flex justify-between q">
       <q-btn-toggle v-model="filter" toggle-color="primary" :options="[
         { label: 'Show all', value: 'all' },
         { label: 'Done', value: 'done' },
@@ -59,7 +59,7 @@ const loadInitialData = async () => {
     .catch(error => {
       $q.notify({
         icon: 'error',
-        message: 'Something went wrong while loading the to-do list.',
+        message: 'Something went wrong while loading the to-do list. ' + error,
         color: 'red',
         position: 'top',
         actions: [
