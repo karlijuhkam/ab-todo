@@ -1,5 +1,17 @@
 <template>
   <div class="column q-pa-md q-gutter-md full-width full-height">
+    <div class="flex justify-between q-gutter-sm">
+      <q-btn-toggle v-model="filter" toggle-color="primary" :options="[
+        { label: 'Show all', value: 'all' },
+        { label: 'Done', value: 'done' },
+        { label: 'Undone', value: 'undone' }
+      ]" />
+
+      <div class="q-gutter-sm">
+        <q-btn outline color="red" label="Clear all" icon="delete" @click="clearAll" />
+        <q-btn outline color="primary" icon="refresh" @click="reloadToDoList" />
+      </div>
+    </div>
     <div class="q-px-md">
       <q-input v-model="inputText" label="Add a new to-do" @keydown.enter="addNewToDo(inputText)">
         <template v-slot:after>
@@ -17,54 +29,49 @@
           <q-btn round flat color="deep-orange" icon="delete" @click="removeToDo(item.id)" />
         </q-item-section>
       </q-item>
-      <q-inner-loading :showing="loading" />
     </q-virtual-scroll>
     <p v-else class="q-pa-md text-center flex content-center justify-center" style="height: 75dvh">
       {{ noToDoMessage }}
     </p>
-    <div>
-      <q-btn-toggle v-model="filter" toggle-color="primary" :options="[
-        { label: 'Show all', value: 'all' },
-        { label: 'Done', value: 'done' },
-        { label: 'Undone', value: 'undone' }
-      ]" />
-
-      <q-btn outline color="red" label="Clear all" icon="delete" @click="clearAll" />
-      <q-btn outline color="primary" icon="refresh" @click="reloadToDoList" />
-    </div>
+    <q-inner-loading :showing="loading" size="5rem" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useQuasar, useTimeout } from 'quasar';
+import { useJsonPlaceholder } from 'src/composables/useJsonPlaceholder';
+
+const $q = useQuasar();
 const toDoList = ref(null);
 const loading = ref(false);
 const inputText = ref(null);
 const filter = ref('all');
+const { registerTimeout } = useTimeout()
 
 const loadInitialData = async () => {
-  try {
-    loading.value = true;
-    const response = await fetch('https://jsonplaceholder.typicode.com/todos')
-      .then(response => response.json())
-      .then(data => {
-        toDoList.value = data;
-      });
-    if (response) {
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
-      toDoList.value = await response.json();
-    }
-
-  } catch (error) {
-    console.error(error.message);
-  } finally {
-    loading.value = false;
-  }
+  loading.value = true;
+  await useJsonPlaceholder()
+    .then(data => {
+      toDoList.value = data;
+      loading.value = false;
+    })
+    .catch(error => {
+      $q.notify({
+        icon: 'error',
+        message: 'Something went wrong while loading the to-do list.',
+        color: 'red',
+        position: 'top',
+        actions: [
+          { label: 'Try again', color: 'white', handler: () => { reloadToDoList() } }
+        ]
+      })
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
-
-loadInitialData();
+registerTimeout(loadInitialData, 1000);
 
 const addNewToDo = (newToDoTitle) => {
   // Prevent adding empty to-do
@@ -112,11 +119,11 @@ const noToDoMessage = computed(() => {
     return 'No to-dos with "Undone" status found. Add a new to-do above.';
   }
 
-  return ' No to-dos found. Add a new to-do above.';
+  return 'No to-dos found. Add a new to-do above.';
 });
 
 const reloadToDoList = () => {
-  loadInitialData();
+  registerTimeout(loadInitialData, 1000);
 }
 
 </script>
